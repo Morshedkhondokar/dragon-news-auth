@@ -1,26 +1,28 @@
-import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import AuthContext from "../Context/AuthContext";
 
 const Login = () => {
-  const {userLogin, setUser} = useContext(AuthContext)
+  const {userLogin, setUser} = useContext(AuthContext);
+  const [error, setError] = useState({});
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const handleSubmit = (e) =>{
     e.preventDefault();
     const form = e.target;
     const email = form.email.value;
     const password = form.password.value;
-    console.log(email,password)
+    // console.log(email,password)
 
     userLogin(email,password)
     .then(result => {
-      const user = result.user 
+      const user = result.user ;
       setUser(user)
+      navigate(location.state ? location.state : '/' )
     })
-    .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    console.log(errorCode,errorMessage)
+    .catch((err) => {
+   setError({error, login:err.code})
   });
 
   }
@@ -45,6 +47,9 @@ const Login = () => {
               className="input border-red-500 w-full"
               placeholder="Password"
             />
+            {
+              error?.login && (<p className="text-red-600 text-sm my-4">{error.login}</p>)
+            }
             <div>
               <a className="link link-hover">Forgot password?</a>
             </div>
